@@ -18,17 +18,26 @@ def new_game():
     difficulty = request.args.get('difficulty', 'medium')
     
     # Map difficulty levels to number of clues
+    # Adjusted to ensure puzzles can be generated with unique solutions in reasonable time
     difficulty_map = {
-        'easy': 50,      # More clues = easier
-        'medium': 35,    # Medium number of clues
-        'hard': 25       # Fewer clues = harder
+        'easy': 55,       # More clues = easier
+        'medium': 45,     # Medium number of clues
+        'hard': 35        # Fewer clues = harder, but still reasonable
     }
     
-    clues = difficulty_map.get(difficulty, 35)
-    puzzle, solution = sudoku_logic.generate_puzzle(clues)
-    CURRENT['puzzle'] = puzzle
-    CURRENT['solution'] = solution
-    return jsonify({'puzzle': puzzle})
+    clues = difficulty_map.get(difficulty, 45)
+    try:
+        puzzle, solution = sudoku_logic.generate_puzzle(
+            clues=clues,
+            validate_unique=True,
+            max_attempts=50
+        )
+        CURRENT['puzzle'] = puzzle
+        CURRENT['solution'] = solution
+        return jsonify({'puzzle': puzzle})
+    except Exception as e:
+        # If puzzle generation fails, return an error
+        return jsonify({'error': f'Failed to generate puzzle: {str(e)}'}), 500
 
 @app.route('/check', methods=['POST'])
 def check_solution():

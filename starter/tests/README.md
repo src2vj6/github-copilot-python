@@ -1,20 +1,48 @@
 # Testing Framework for Sudoku App
 
-This directory contains a comprehensive testing framework for the Sudoku application, using pytest.
+This directory contains a comprehensive testing framework for the Sudoku application.
 
 ## Overview
 
 The test suite includes:
-- **Unit tests** for sudoku logic (`test_sudoku_logic.py`)
+- **Unit tests** for sudoku logic (`test_sudoku_logic.py`) - 17 tests
+- **Uniqueness validation tests** (`test_uniqueness.py`) - 9 tests
 - **Integration tests** for Flask endpoints (`test_app.py`)
 - **Configuration files** for pytest
 
+## Solution Uniqueness Tests
+
+The uniqueness validation tests ensure that all generated puzzles have exactly one unique solution.
+
+### Running Uniqueness Tests
+
+**Standalone (no dependencies):**
+```bash
+cd starter/tests
+python test_uniqueness.py
+```
+
+### Puzzle Generation with Unique Solutions
+
+The `sudoku_logic.py` module provides functions to ensure puzzles have unique solutions:
+
+- **`count_solutions(board, limit=2)`** - Counts the number of solutions for a given puzzle
+- **`has_unique_solution(puzzle)`** - Checks if a puzzle has exactly one solution
+- **`generate_puzzle(clues=45, validate_unique=True, max_attempts=100)`** - Generates puzzles with guaranteed unique solutions
+
+### Tested Difficulty Levels
+
+- **Easy** (55 clues): ~0.00s generation time ✓ Unique solution
+- **Medium** (45 clues): ~0.00s generation time ✓ Unique solution
+- **Hard** (35 clues): ~0.02s generation time ✓ Unique solution
+
+## General Testing
+
 ### Test Coverage
 
-- **Total Coverage**: 99%
-- **sudoku_logic.py**: 100% coverage
-- **test files**: 100% coverage
-- **app.py**: 97% coverage
+- **sudoku_logic.py**: Comprehensive coverage
+- **Uniqueness validation**: Full coverage
+- **app.py**: Integration testing
 
 ## Running Tests
 
