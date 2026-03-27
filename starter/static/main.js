@@ -7,6 +7,27 @@ let hintsUsed = 0;
 let currentDifficulty = 'medium';
 let solutionChecker = null;
 
+// Dark Mode Management
+function initializeDarkMode() {
+  const darkModeToggle = document.getElementById('dark-mode-toggle');
+  const isDarkMode = localStorage.getItem('darkMode') === 'true';
+  
+  // Set initial dark mode state
+  if (isDarkMode) {
+    document.body.classList.add('dark-mode');
+  }
+  
+  // Add click event listener to toggle
+  darkModeToggle.addEventListener('click', toggleDarkMode);
+}
+
+function toggleDarkMode() {
+  const body = document.body;
+  body.classList.toggle('dark-mode');
+  const isDarkMode = body.classList.contains('dark-mode');
+  localStorage.setItem('darkMode', isDarkMode);
+}
+
 // Local storage management for top scores
 function getScores() {
   const scores = localStorage.getItem('sudoku_scores');
@@ -321,6 +342,7 @@ async function getHint() {
 
 // Wire buttons
 window.addEventListener('load', () => {
+  initializeDarkMode();
   document.getElementById('new-game').addEventListener('click', newGame);
   document.getElementById('check-solution').addEventListener('click', checkSolution);
   document.getElementById('get-hint').addEventListener('click', getHint);
