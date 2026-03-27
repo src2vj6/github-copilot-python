@@ -5,6 +5,7 @@ let timerInterval = null;
 let elapsedSeconds = 0;
 let hintsUsed = 0;
 let currentDifficulty = 'medium';
+let solutionChecker = null;
 
 // Local storage management for top scores
 function getScores() {
@@ -81,6 +82,86 @@ async function validateCellInput(inputElement, row, col, value) {
   }
 }
 
+// Solution checker using event delegation
+class SolutionChecker {
+  constructor(boardElement) {
+    this.boardElement = boardElement;
+    this.solvedCells = new Set();
+    
+    // Attach delegated event listener to the board instead of individual cells
+    this.boardElement.addEventListener('change', (e) => this.handleCellChange(e));
+    this.boardElement.addEventListener('input', (e) => this.handleCellInput(e));
+  }
+  
+  handleCellChange(e) {
+    if (e.target.classList.contains('sudoku-cell') && !e.target.disabled) {
+      const row = parseInt(e.target.dataset.row);
+      const col = parseInt(e.target.dataset.col);
+      const value = e.target.value;
+      
+      if (value === '') {
+        this.solvedCells.delete(`${row}-${col}`);
+      } else {
+        this.solvedCells.add(`${row}-${col}`);
+      }
+      
+      this.checkIfPuzzleComplete();
+    }
+  }
+  
+  handleCellInput(e) {
+    if (e.target.classList.contains('sudoku-cell') && !e.target.disabled) {
+      const row = parseInt(e.target.dataset.row);
+      const col = parseInt(e.target.dataset.col);
+      const value = e.target.value;
+      
+      // Clean input to only allow 1-9
+      const cleanedValue = value.replace(/[^1-9]/g, '');
+      e.target.value = cleanedValue;
+      
+      if (cleanedValue !== '') {
+        validateCellInput(e.target, row, col, cleanedValue);
+      } else {
+        e.target.classList.remove('incorrect', 'valid-entry');
+      }
+    }
+  }
+  
+  checkIfPuzzleComplete() {
+    // Count non-disabled cells (user-filled cells)
+    const allInputs = this.boardElement.querySelectorAll('.sudoku-cell:not(:disabled)');
+    const filledCells = this.boardElement.querySelectorAll('.sudoku-cell:not(:disabled)');
+    
+    let emptyCount = 0;
+    filledCells.forEach(cell => {
+      if (cell.value === '') {
+        emptyCount++;
+      }
+    });
+    
+    // If all cells are filled, prompt the user to check their solution
+    if (emptyCount === 0) {
+      const msg = document.getElementById('message');
+      msg.style.color = '#ff9800';
+      msg.innerText = 'All cells filled! Click "Check Solution" to verify.';
+    }
+  }
+  
+  getBoardState() {
+    const board = [];
+    for (let i = 0; i < SIZE; i++) {
+      board[i] = [];
+      for (let j = 0; j < SIZE; j++) {
+        const input = this.boardElement.querySelector(
+          `input[data-row="${i}"][data-col="${j}"]`
+        );
+        board[i][j] = input.value ? parseInt(input.value, 10) : 0;
+      }
+    }
+    return board;
+  }
+}
+
 function updateTimer() {
   elapsedSeconds++;
   document.getElementById('timer').innerText = formatTime(elapsedSeconds);
@@ -119,11 +200,7 @@ function createBoardElement() {
       input.className = 'sudoku-cell';
       input.dataset.row = i;
       input.dataset.col = j;
-      input.addEventListener('input', (e) => {
-        const val = e.target.value.replace(/[^1-9]/g, '');
-        e.target.value = val;
-        validateCellInput(e.target, i, j, val);
-      });
+      // Event listeners are now handled by event delegation in SolutionChecker
       rowDiv.appendChild(input);
     }
     boardDiv.appendChild(rowDiv);
@@ -133,7 +210,11 @@ function createBoardElement() {
 function renderPuzzle(puz) {
   puzzle = puz;
   createBoardElement();
+  
+  // Initialize the solution checker with event delegation
   const boardDiv = document.getElementById('sudoku-board');
+  solutionChecker = new SolutionChecker(boardDiv);
+  
   const inputs = boardDiv.getElementsByTagName('input');
   for (let i = 0; i < SIZE; i++) {
     for (let j = 0; j < SIZE; j++) {
@@ -165,17 +246,11 @@ async function newGame() {
 }
 
 async function checkSolution() {
-  const boardDiv = document.getElementById('sudoku-board');
-  const inputs = boardDiv.getElementsByTagName('input');
-  const board = [];
-  for (let i = 0; i < SIZE; i++) {
-    board[i] = [];
-    for (let j = 0; j < SIZE; j++) {
-      const idx = i * SIZE + j;
-      const val = inputs[idx].value;
-      board[i][j] = val ? parseInt(val, 10) : 0;
-    }
+  if (!solutionChecker) {
+    return;
   }
+  
+  const board = solutionChecker.getBoardState();
   const res = await fetch('/check', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -188,6 +263,8 @@ async function checkSolution() {
     msg.innerText = data.error;
     return;
   }
+  const boardDiv = document.getElementById('sudoku-board');
+  const inputs = boardDiv.getElementsByTagName('input');
   const incorrect = new Set(data.incorrect.map(x => x[0]*SIZE + x[1]));
   for (let idx = 0; idx < inputs.length; idx++) {
     const inp = inputs[idx];
@@ -210,17 +287,11 @@ async function checkSolution() {
 }
 
 async function getHint() {
-  const boardDiv = document.getElementById('sudoku-board');
-  const inputs = boardDiv.getElementsByTagName('input');
-  const board = [];
-  for (let i = 0; i < SIZE; i++) {
-    board[i] = [];
-    for (let j = 0; j < SIZE; j++) {
-      const idx = i * SIZE + j;
-      const val = inputs[idx].value;
-      board[i][j] = val ? parseInt(val, 10) : 0;
-    }
+  if (!solutionChecker) {
+    return;
   }
+  
+  const board = solutionChecker.getBoardState();
   const res = await fetch('/hint', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -236,10 +307,12 @@ async function getHint() {
   // Fill in the hint value
   const row = data.row;
   const col = data.col;
-  const idx = row * SIZE + col;
-  const inp = inputs[idx];
-  inp.value = data.value;
-  inp.className = 'sudoku-cell hinted';
+  const boardDiv = document.getElementById('sudoku-board');
+  const hintInput = boardDiv.querySelector(
+    `input[data-row="${row}"][data-col="${col}"]`
+  );
+  hintInput.value = data.value;
+  hintInput.className = 'sudoku-cell hinted';
   hintsUsed++;
   updateHintsDisplay();
   msg.style.color = '#f57c00';
