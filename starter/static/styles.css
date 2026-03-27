@@ -171,36 +171,36 @@ body.dark-mode .sudoku-cell.prefilled {
 }
 
 .sudoku-cell.incorrect {
-    background: #ffcdd2;
+    background: #ffcdd2 !important;
     transition: background-color 0.3s ease;
 }
 
 body.dark-mode .sudoku-cell.incorrect {
-    background: #c62828;
+    background: #c62828 !important;
     color: #fff;
 }
 
 .sudoku-cell.hinted {
-    background: #fff9c4;
+    background: #fff9c4 !important;
     font-weight: bold;
     color: #f57f17;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body.dark-mode .sudoku-cell.hinted {
-    background: #f57f17;
+    background: #f57f17 !important;
     color: #fff;
 }
 
 .sudoku-cell.valid-entry {
-    background: #c8e6c9;
+    background: #c8e6c9 !important;
     color: #2e7d32;
     font-weight: bold;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body.dark-mode .sudoku-cell.valid-entry {
-    background: #1b5e20;
+    background: #1b5e20 !important;
     color: #81c784;
 }
 

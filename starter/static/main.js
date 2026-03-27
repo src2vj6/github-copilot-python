@@ -295,9 +295,9 @@ async function checkSolution() {
   for (let idx = 0; idx < inputs.length; idx++) {
     const inp = inputs[idx];
     if (inp.disabled) continue;
-    inp.className = 'sudoku-cell';
+    inp.classList.remove('incorrect', 'valid-entry');
     if (incorrect.has(idx)) {
-      inp.className = 'sudoku-cell incorrect';
+      inp.classList.add('incorrect');
     }
   }
   if (incorrect.size === 0) {
@@ -338,7 +338,8 @@ async function getHint() {
     `input[data-row="${row}"][data-col="${col}"]`
   );
   hintInput.value = data.value;
-  hintInput.className = 'sudoku-cell hinted';
+  hintInput.classList.remove('incorrect', 'valid-entry');
+  hintInput.classList.add('hinted');
   hintsUsed++;
   updateHintsDisplay();
   msg.style.color = '#f57c00';
