@@ -11,6 +11,32 @@ function formatTime(seconds) {
   return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+async function validateCellInput(inputElement, row, col, value) {
+  // Remove any previous validation classes
+  inputElement.classList.remove('incorrect', 'valid-entry');
+  
+  if (value === '') {
+    return; // Empty cell, no validation needed
+  }
+  
+  const res = await fetch('/validate-cell', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({row, col, value: parseInt(value, 10)})
+  });
+  
+  const data = await res.json();
+  if (data.error) {
+    return;
+  }
+  
+  if (data.is_correct) {
+    inputElement.classList.add('valid-entry');
+  } else {
+    inputElement.classList.add('incorrect');
+  }
+}
+
 function updateTimer() {
   elapsedSeconds++;
   document.getElementById('timer').innerText = formatTime(elapsedSeconds);
@@ -52,6 +78,7 @@ function createBoardElement() {
       input.addEventListener('input', (e) => {
         const val = e.target.value.replace(/[^1-9]/g, '');
         e.target.value = val;
+        validateCellInput(e.target, i, j, val);
       });
       rowDiv.appendChild(input);
     }

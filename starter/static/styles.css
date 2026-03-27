@@ -98,6 +98,12 @@ h1 {
     color: #f57f17;
 }
 
+.sudoku-cell.valid-entry {
+    background: #c8e6c9;
+    color: #2e7d32;
+    font-weight: bold;
+}
+
 .sudoku-cell:nth-child(3),
 .sudoku-cell:nth-child(6) {
     border-right: 3px solid #333;

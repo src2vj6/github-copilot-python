@@ -53,6 +53,22 @@ def check_solution():
                 incorrect.append([i, j])
     return jsonify({'incorrect': incorrect})
 
+@app.route('/validate-cell', methods=['POST'])
+def validate_cell():
+    data = request.json
+    row = data.get('row')
+    col = data.get('col')
+    value = data.get('value')
+    
+    solution = CURRENT.get('solution')
+    if solution is None:
+        return jsonify({'error': 'No game in progress'}), 400
+    
+    # Check if the entered value matches the solution
+    is_correct = (value == solution[row][col])
+    
+    return jsonify({'is_correct': is_correct})
+
 @app.route('/hint', methods=['POST'])
 def get_hint():
     data = request.json
