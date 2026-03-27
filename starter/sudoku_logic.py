@@ -1,33 +1,78 @@
 import copy
 import random
+from typing import List, Tuple
 
-SIZE = 9
-EMPTY = 0
+SIZE: int = 9
+EMPTY: int = 0
+BOX_SIZE: int = 3
+DIFFICULTY_CLUES = {
+    'easy': 55,
+    'medium': 45,
+    'hard': 35
+}
 
-def deep_copy(board):
+def deep_copy(board: List[List[int]]) -> List[List[int]]:
+    """Create a deep copy of a sudoku board.
+    
+    Args:
+        board: A 9x9 sudoku board represented as a list of lists.
+    
+    Returns:
+        A new independent copy of the board.
+    """
     return copy.deepcopy(board)
 
-def create_empty_board():
+def create_empty_board() -> List[List[int]]:
+    """Create an empty 9x9 sudoku board.
+    
+    Returns:
+        A 9x9 board filled with zeros (EMPTY values).
+    """
     return [[EMPTY for _ in range(SIZE)] for _ in range(SIZE)]
 
-def is_safe(board, row, col, num):
+def is_safe(board: List[List[int]], row: int, col: int, num: int) -> bool:
+    """Check if placing a number at (row, col) is valid.
+    
+    Validates sudoku constraints: no duplicate in row, column, or 3x3 box.
+    
+    Args:
+        board: The sudoku board.
+        row: The row index (0-8).
+        col: The column index (0-8).
+        num: The number to place (1-9).
+    
+    Returns:
+        True if the placement is valid, False otherwise.
+    """
     # Check row and column
     for x in range(SIZE):
         if board[row][x] == num or board[x][col] == num:
             return False
     # Check 3x3 box
-    start_row = row - row % 3
-    start_col = col - col % 3
-    for i in range(3):
-        for j in range(3):
+    start_row = row - row % BOX_SIZE
+    start_col = col - col % BOX_SIZE
+    for i in range(BOX_SIZE):
+        for j in range(BOX_SIZE):
             if board[start_row + i][start_col + j] == num:
                 return False
     return True
 
-def fill_board(board):
+def fill_board(board: List[List[int]]) -> bool:
+    """Fill an empty board with valid sudoku values using backtracking.
+    
+    Uses recursive backtracking to generate a complete valid sudoku solution.
+    Randomly selects candidates to create different puzzles.
+    
+    Args:
+        board: An empty or partially filled board to complete.
+    
+    Returns:
+        True if board was successfully filled, False if impossible.
+    """
     for row in range(SIZE):
         for col in range(SIZE):
             if board[row][col] == EMPTY:
+                # Try numbers in random order for variety
                 possible = list(range(1, SIZE + 1))
                 random.shuffle(possible)
                 for candidate in possible:
@@ -35,11 +80,21 @@ def fill_board(board):
                         board[row][col] = candidate
                         if fill_board(board):
                             return True
+                        # Backtrack: undo placement and try next candidate
                         board[row][col] = EMPTY
                 return False
     return True
 
-def remove_cells(board, clues):
+def remove_cells(board: List[List[int]], clues: int) -> None:
+    """Remove cells from a complete board to create a puzzle.
+    
+    Randomly removes cells to achieve the desired number of clues (givens).
+    Modifies the board in-place.
+    
+    Args:
+        board: A complete, filled sudoku board.
+        clues: The target number of clues to remain in the puzzle.
+    """
     attempts = SIZE * SIZE - clues
     while attempts > 0:
         row = random.randrange(SIZE)
@@ -48,7 +103,7 @@ def remove_cells(board, clues):
             board[row][col] = EMPTY
             attempts -= 1
 
-def count_solutions(board, limit=2):
+def count_solutions(board: List[List[int]], limit: int = 2) -> int:
     """
     Count the number of solutions for a given puzzle.
     
@@ -76,7 +131,7 @@ def count_solutions(board, limit=2):
     # No empty cells found, we have a complete solution
     return 1
 
-def has_unique_solution(puzzle):
+def has_unique_solution(puzzle: List[List[int]]) -> bool:
     """
     Check if a puzzle has exactly one unique solution.
     
@@ -90,7 +145,7 @@ def has_unique_solution(puzzle):
     board_copy = deep_copy(puzzle)
     return count_solutions(board_copy, limit=2) == 1
 
-def generate_puzzle(clues=35, validate_unique=True, max_attempts=100):
+def generate_puzzle(clues: int = 35, validate_unique: bool = True, max_attempts: int = 100) -> Tuple[List[List[int]], List[List[int]]]:
     """
     Generate a sudoku puzzle with optional uniqueness validation.
     
