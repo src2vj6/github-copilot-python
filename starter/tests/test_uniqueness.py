@@ -83,50 +83,48 @@ class TestSolutionUniqueness:
         puzzle, _ = sudoku_logic.generate_puzzle()
         # Should have unique solution by default
         assert sudoku_logic.has_unique_solution(puzzle)
-
-
-def run_all_tests():
-    """Run all uniqueness tests and display results."""
-    print("=" * 70)
-    print("SUDOKU SOLUTION UNIQUENESS TESTS")
-    print("=" * 70)
     
-    test_suite = TestSolutionUniqueness()
-    tests = [
-        ("Count solutions - empty board", test_suite.test_count_solutions_empty_board),
-        ("Count solutions - complete board", test_suite.test_count_solutions_complete_board),
-        ("Count solutions - respects limit", test_suite.test_count_solutions_respects_limit),
-        ("Has unique solution - valid puzzle", test_suite.test_has_unique_solution_valid_puzzle),
-        ("Has unique solution - empty board", test_suite.test_has_unique_solution_empty_board),
-        ("Has unique solution - multiple clues", test_suite.test_has_unique_solution_multiple_clues),
-        ("Generate puzzle - with validation", test_suite.test_generate_puzzle_with_validation),
-        ("Generate puzzle - without validation", test_suite.test_generate_puzzle_without_validation),
-        ("Generate puzzle - default validates", test_suite.test_generate_puzzle_default_validates),
-    ]
+    def test_count_solutions_with_partial_board(self):
+        """Test count_solutions with a partially filled board."""
+        board = sudoku_logic.create_empty_board()
+        # Add some clues
+        board[0][0] = 1
+        board[1][1] = 2
+        board[2][2] = 3
+        # Should have multiple solutions
+        count = sudoku_logic.count_solutions(board, limit=2)
+        assert count > 1
     
-    passed = 0
-    failed = 0
+    def test_has_unique_solution_almost_complete(self):
+        """Test has_unique_solution with nearly complete puzzle."""
+        _, solution = sudoku_logic.generate_puzzle(validate_unique=False)
+        # Remove just one cell
+        partial = sudoku_logic.deep_copy(solution)
+        partial[8][8] = 0
+        # Nearly complete puzzles typically have unique solutions
+        result = sudoku_logic.has_unique_solution(partial)
+        # We're just testing it doesn't error, not the specific result
+        assert isinstance(result, bool)
     
-    print("\n[Running Tests]")
-    for test_name, test_func in tests:
-        try:
-            test_func()
-            print(f"  ✓ {test_name}")
-            passed += 1
-        except AssertionError as e:
-            print(f"  ✗ {test_name}: {e}")
-            failed += 1
-        except Exception as e:
-            print(f"  ✗ {test_name}: ERROR - {e}")
-            failed += 1
+    def test_count_solutions_limit_zero(self):
+        """Test count_solutions behavior with limit parameter."""
+        board = sudoku_logic.create_empty_board()
+        # Test with different limits
+        count_limit_1 = sudoku_logic.count_solutions(board, limit=1)
+        count_limit_3 = sudoku_logic.count_solutions(board, limit=3)
+        assert count_limit_1 <= count_limit_3
     
-    print("\n" + "=" * 70)
-    print(f"Test Results: {passed} PASSED, {failed} FAILED")
-    print("=" * 70)
-    
-    return 0 if failed == 0 else 1
-
-
-if __name__ == "__main__":
-    exit(run_all_tests())
+    def test_generate_puzzle_max_attempts(self):
+        """Test puzzle generation respects max_attempts parameter."""
+        # Test with easier parameters that won't timeout
+        puzzle, solution = sudoku_logic.generate_puzzle(
+            clues=50,
+            validate_unique=True,
+            max_attempts=5
+        )
+        # Should still get a valid puzzle
+        assert puzzle is not None
+        assert solution is not None
+        clue_count = sum(1 for row in puzzle for cell in row if cell != 0)
+        assert clue_count == 50
 

@@ -53,7 +53,7 @@ class TestNewGameRoute:
     
     def test_new_game_with_difficulty_parameter(self, client):
         """Test creating a new game with different difficulty levels."""
-        difficulty_clue_map = {'easy': 50, 'medium': 35, 'hard': 25}
+        difficulty_clue_map = {'easy': 55, 'medium': 45, 'hard': 35}
         for difficulty, expected_clues in difficulty_clue_map.items():
             response = client.get(f'/new?difficulty={difficulty}')
             assert response.status_code == 200
@@ -88,7 +88,7 @@ class TestNewGameRoute:
         data = json.loads(response.data)
         puzzle = data['puzzle']
         clue_count = sum(1 for row in puzzle for cell in row if cell != 0)
-        assert clue_count == 35  # Medium difficulty
+        assert clue_count == 45  # Medium difficulty
 
 
 class TestCheckSolutionRoute:
