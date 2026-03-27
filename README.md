@@ -46,7 +46,7 @@ python app.py
 
 Use GitHub Copilot to refactor the code for this game to add more advanced features. The goal is to create a more modern and maintainable codebase and add additional functionality to the final product. You can use any combination of code completion and chat features, like Ask, Edit, or Agent modes.
 
-- Errors should be handled gracefully with appropriate messages to the user.
+- ✓ **Errors should be handled gracefully with appropriate messages to the user.**
 - ✓ **Implement a Sudoku board generator that creates a valid Sudoku puzzle with a unique solution.**
 - ✓ **Add a timer to track how long it takes to solve the puzzle.**
 - ✓ **Implement a solution checker that verifies if the user's solution is correct using event delegation.**
