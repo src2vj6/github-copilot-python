@@ -11,6 +11,37 @@ h1 {
     color: #333;
 }
 
+.difficulty-selector {
+    margin: 20px auto;
+    font-size: 16px;
+}
+
+.difficulty-selector label {
+    margin-right: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.difficulty-selector select {
+    padding: 6px 12px;
+    font-size: 16px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.difficulty-selector select:hover {
+    border-color: #1976d2;
+}
+
+.difficulty-selector select:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 4px rgba(25, 118, 210, 0.5);
+}
+
 #sudoku-board {
     display: inline-block;
     margin: 30px auto;

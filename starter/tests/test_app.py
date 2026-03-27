@@ -51,19 +51,21 @@ class TestNewGameRoute:
         assert len(data['puzzle']) == 9
         assert all(len(row) == 9 for row in data['puzzle'])
     
-    def test_new_game_with_clues_parameter(self, client):
-        """Test creating a new game with custom clue count."""
-        response = client.get('/new?clues=40')
-        assert response.status_code == 200
-        
-        data = json.loads(response.data)
-        puzzle = data['puzzle']
-        clue_count = sum(1 for row in puzzle for cell in row if cell != 0)
-        assert clue_count == 40
+    def test_new_game_with_difficulty_parameter(self, client):
+        """Test creating a new game with different difficulty levels."""
+        difficulty_clue_map = {'easy': 50, 'medium': 35, 'hard': 25}
+        for difficulty, expected_clues in difficulty_clue_map.items():
+            response = client.get(f'/new?difficulty={difficulty}')
+            assert response.status_code == 200
+            
+            data = json.loads(response.data)
+            puzzle = data['puzzle']
+            clue_count = sum(1 for row in puzzle for cell in row if cell != 0)
+            assert clue_count == expected_clues
     
     def test_new_game_stores_puzzle_and_solution(self, client, app_context):
         """Test that new game stores puzzle and solution in CURRENT."""
-        response = client.get('/new?clues=35')
+        response = client.get('/new?difficulty=medium')
         assert response.status_code == 200
         
         assert CURRENT['puzzle'] is not None
@@ -73,21 +75,20 @@ class TestNewGameRoute:
     
     def test_new_game_puzzle_matches_stored(self, client, app_context):
         """Test that returned puzzle matches stored puzzle."""
-        response = client.get('/new?clues=35')
+        response = client.get('/new?difficulty=medium')
         data = json.loads(response.data)
         
         assert data['puzzle'] == CURRENT['puzzle']
     
-    def test_new_game_with_various_clue_counts(self, client):
-        """Test new game with various clue counts."""
-        for clues in [20, 35, 50]:
-            response = client.get(f'/new?clues={clues}')
-            assert response.status_code == 200
-            
-            data = json.loads(response.data)
-            puzzle = data['puzzle']
-            clue_count = sum(1 for row in puzzle for cell in row if cell != 0)
-            assert clue_count == clues
+    def test_new_game_default_difficulty(self, client):
+        """Test that new game defaults to medium difficulty."""
+        response = client.get('/new')
+        assert response.status_code == 200
+        
+        data = json.loads(response.data)
+        puzzle = data['puzzle']
+        clue_count = sum(1 for row in puzzle for cell in row if cell != 0)
+        assert clue_count == 35  # Medium difficulty
 
 
 class TestCheckSolutionRoute:
