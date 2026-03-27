@@ -92,6 +92,12 @@ h1 {
     background: #ffcdd2;
 }
 
+.sudoku-cell.hinted {
+    background: #fff9c4;
+    font-weight: bold;
+    color: #f57f17;
+}
+
 .sudoku-cell:nth-child(3),
 .sudoku-cell:nth-child(6) {
     border-right: 3px solid #333;
@@ -127,3 +133,11 @@ button:hover {
     font-size: 16px;
     color: #d32f2f;
 }
+
+#hints-counter {
+    margin-left: 15px;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
+

@@ -48,10 +48,10 @@ Use GitHub Copilot to refactor the code for this game to add more advanced featu
 
 - Errors should be handled gracefully with appropriate messages to the user.
 - ✓ **Implement a Sudoku board generator that creates a valid Sudoku puzzle with a unique solution.**
-- Add a timer to track how long it takes to solve the puzzle.
+- ✓ **Add a timer to track how long it takes to solve the puzzle.**
 - Implement a solution checker that verifies if the user's solution is correct using event delegation.
-- Add a difficulty selector to allow users to choose between easy, medium, and hard puzzles.
-- Add a hint feature that provides clues for the user that are noted with unique colors.
+- ✓ **Add a difficulty selector to allow users to choose between easy, medium, and hard puzzles.**
+- ✓ **Add a hint feature that provides clues for the user that are noted with unique colors.**
 - Add a check puzzle button that checks the current state of the board against the solution.
 - User should get immediate feedback on their input, such as highlighting invalid entries.
 - Top 10 scores should be saved in local storage and displayed on the page with the user's name, time taken, hints used, and difficulty level.
@@ -91,4 +91,47 @@ num_solutions = sudoku_logic.count_solutions(puzzle, limit=2)
 For detailed testing instructions and documentation, see [tests/README.md](starter/tests/README.md).
 
 All generated puzzles are guaranteed to have exactly one solution, providing a fair and enjoyable gaming experience.
+
+### Timer Feature ✓
+
+The game now includes a real-time timer that tracks how long it takes to solve each puzzle.
+
+#### Features:
+
+- **Timer Display**: Shows elapsed time in MM:SS format at the top of the game interface
+- **Auto-start**: Timer automatically starts when a new game is created
+- **Auto-stop**: Timer stops when the puzzle is solved correctly
+- **Performance Tracking**: Elapsed time is displayed in the congratulations message when the puzzle is completed
+
+#### How It Works:
+
+The timer is implemented using JavaScript on the client-side:
+- Starts on page load and when a new game is initiated
+- Updates every second, displaying the time in MM:SS format
+- Automatically pauses when the puzzle is successfully solved
+- Provides immediate visual feedback of the player's progress
+
+This encourages players to improve their solving times while maintaining the challenge of the puzzle.
+
+### Hint Feature ✓
+
+The game now includes an interactive hint system that helps users solve puzzles by revealing correct values for empty cells.
+
+#### Features:
+
+- **Get Hint Button**: Players can click "Get Hint" to receive help with solving the puzzle
+- **Random Cell Selection**: Each hint reveals a random empty cell from the current puzzle state
+- **Unique Visual Styling**: Hinted cells are highlighted with a distinctive yellow background (#fff9c4) and dark yellow text (#f57f17) for easy identification
+- **Hint Counter**: Displays the total number of hints used during the current game
+- **Performance Tracking**: The number of hints used is included in the congratulations message when the puzzle is completed
+
+#### How It Works:
+
+The hint system is implemented with both backend and frontend components:
+- **Backend** (`/hint` endpoint in `app.py`): Finds empty cells that haven't been filled and returns a random cell with its solution value
+- **Frontend** (JavaScript in `main.js`): Calls the hint endpoint, fills in the revealed value, applies the hinted styling, and updates the hint counter
+
+#### Usage:
+
+Players can click the "Get Hint" button at any time during gameplay. Each hint reveals one empty cell from the solution, making it easier to progress while still maintaining the challenge of solving most of the puzzle themselves.
 

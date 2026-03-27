@@ -3,6 +3,7 @@ const SIZE = 9;
 let puzzle = [];
 let timerInterval = null;
 let elapsedSeconds = 0;
+let hintsUsed = 0;
 
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
@@ -29,6 +30,10 @@ function stopTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
   }
+}
+
+function updateHintsDisplay() {
+  document.getElementById('hints-counter').innerText = `Hints: ${hintsUsed}`;
 }
 
 function createBoardElement() {
@@ -82,6 +87,8 @@ async function newGame() {
   const data = await res.json();
   renderPuzzle(data.puzzle);
   document.getElementById('message').innerText = '';
+  hintsUsed = 0;
+  updateHintsDisplay();
   startTimer();
 }
 
@@ -121,17 +128,55 @@ async function checkSolution() {
   if (incorrect.size === 0) {
     stopTimer();
     msg.style.color = '#388e3c';
-    msg.innerText = `Congratulations! You solved it in ${formatTime(elapsedSeconds)}!`;
+    msg.innerText = `Congratulations! You solved it in ${formatTime(elapsedSeconds)}! Hints used: ${hintsUsed}`;
   } else {
     msg.style.color = '#d32f2f';
     msg.innerText = 'Some cells are incorrect.';
   }
 }
 
+async function getHint() {
+  const boardDiv = document.getElementById('sudoku-board');
+  const inputs = boardDiv.getElementsByTagName('input');
+  const board = [];
+  for (let i = 0; i < SIZE; i++) {
+    board[i] = [];
+    for (let j = 0; j < SIZE; j++) {
+      const idx = i * SIZE + j;
+      const val = inputs[idx].value;
+      board[i][j] = val ? parseInt(val, 10) : 0;
+    }
+  }
+  const res = await fetch('/hint', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({board})
+  });
+  const data = await res.json();
+  const msg = document.getElementById('message');
+  if (data.error) {
+    msg.style.color = '#d32f2f';
+    msg.innerText = data.error;
+    return;
+  }
+  // Fill in the hint value
+  const row = data.row;
+  const col = data.col;
+  const idx = row * SIZE + col;
+  const inp = inputs[idx];
+  inp.value = data.value;
+  inp.className = 'sudoku-cell hinted';
+  hintsUsed++;
+  updateHintsDisplay();
+  msg.style.color = '#f57c00';
+  msg.innerText = 'Hint provided!';
+}
+
 // Wire buttons
 window.addEventListener('load', () => {
   document.getElementById('new-game').addEventListener('click', newGame);
   document.getElementById('check-solution').addEventListener('click', checkSolution);
+  document.getElementById('get-hint').addEventListener('click', getHint);
   // initialize
   newGame();
 });
