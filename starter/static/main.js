@@ -4,6 +4,50 @@ let puzzle = [];
 let timerInterval = null;
 let elapsedSeconds = 0;
 let hintsUsed = 0;
+let currentDifficulty = 'medium';
+
+// Local storage management for top scores
+function getScores() {
+  const scores = localStorage.getItem('sudoku_scores');
+  return scores ? JSON.parse(scores) : [];
+}
+
+function saveScores(scores) {
+  localStorage.setItem('sudoku_scores', JSON.stringify(scores));
+}
+
+function addScore(name, time, hints, difficulty) {
+  const scores = getScores();
+  scores.push({ name, time, hints, difficulty });
+  // Sort by time (ascending) and keep only top 10
+  scores.sort((a, b) => a.time - b.time);
+  scores.splice(10);
+  saveScores(scores);
+  displayTopScores();
+}
+
+function displayTopScores() {
+  const scores = getScores();
+  const tbody = document.getElementById('scores-tbody');
+  
+  if (scores.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5">No scores yet</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = '';
+  scores.forEach((score, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${score.name}</td>
+      <td>${formatTime(score.time)}</td>
+      <td>${score.hints}</td>
+      <td>${score.difficulty}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
 
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
@@ -110,6 +154,7 @@ function renderPuzzle(puz) {
 
 async function newGame() {
   const difficulty = document.getElementById('difficulty').value;
+  currentDifficulty = difficulty;
   const res = await fetch(`/new?difficulty=${difficulty}`);
   const data = await res.json();
   renderPuzzle(data.puzzle);
@@ -156,6 +201,8 @@ async function checkSolution() {
     stopTimer();
     msg.style.color = '#388e3c';
     msg.innerText = `Congratulations! You solved it in ${formatTime(elapsedSeconds)}! Hints used: ${hintsUsed}`;
+    // Show name modal
+    showNameModal();
   } else {
     msg.style.color = '#d32f2f';
     msg.innerText = 'Some cells are incorrect.';
@@ -204,6 +251,29 @@ window.addEventListener('load', () => {
   document.getElementById('new-game').addEventListener('click', newGame);
   document.getElementById('check-solution').addEventListener('click', checkSolution);
   document.getElementById('get-hint').addEventListener('click', getHint);
+  document.getElementById('submit-score').addEventListener('click', submitScore);
+  // Display initial scores
+  displayTopScores();
   // initialize
   newGame();
 });
+
+function showNameModal() {
+  const modal = document.getElementById('name-modal');
+  document.getElementById('modal-time').innerText = formatTime(elapsedSeconds);
+  document.getElementById('modal-hints').innerText = hintsUsed;
+  document.getElementById('modal-difficulty').innerText = currentDifficulty;
+  document.getElementById('player-name').value = '';
+  modal.style.display = 'block';
+  document.getElementById('player-name').focus();
+}
+
+function submitScore() {
+  const name = document.getElementById('player-name').value.trim();
+  if (!name) {
+    alert('Please enter your name');
+    return;
+  }
+  addScore(name, elapsedSeconds, hintsUsed, currentDifficulty);
+  document.getElementById('name-modal').style.display = 'none';
+}
