@@ -121,6 +121,34 @@ body.dark-mode .sudoku-cell {
     border-color: #555;
 }
 
+/* Unique colors for each 3x3 box */
+.sudoku-cell.box-0 { background: #FFD0D0; } /* Red */
+body.dark-mode .sudoku-cell.box-0 { background: #6a1a1a; }
+
+.sudoku-cell.box-1 { background: #FFE5B4; } /* Orange */
+body.dark-mode .sudoku-cell.box-1 { background: #6a4a1a; }
+
+.sudoku-cell.box-2 { background: #D4E5A8; } /* Yellow-Green */
+body.dark-mode .sudoku-cell.box-2 { background: #5a6a1a; }
+
+.sudoku-cell.box-3 { background: #B4F0C4; } /* Mint Green */
+body.dark-mode .sudoku-cell.box-3 { background: #1a5a3a; }
+
+.sudoku-cell.box-4 { background: #C4E5F5; } /* Sky Blue */
+body.dark-mode .sudoku-cell.box-4 { background: #1a4a6a; }
+
+.sudoku-cell.box-5 { background: #E0C5F5; } /* Lavender */
+body.dark-mode .sudoku-cell.box-5 { background: #4a1a6a; }
+
+.sudoku-cell.box-6 { background: #F5D4E5; } /* Rose */
+body.dark-mode .sudoku-cell.box-6 { background: #6a1a4a; }
+
+.sudoku-cell.box-7 { background: #D4F5D4; } /* Light Green */
+body.dark-mode .sudoku-cell.box-7 { background: #1a6a1a; }
+
+.sudoku-cell.box-8 { background: #F5E5B4; } /* Peach */
+body.dark-mode .sudoku-cell.box-8 { background: #6a5a1a; }
+
 .sudoku-cell:focus {
     background: #e0f7fa;
     transition: background 0.2s;
@@ -181,9 +209,19 @@ body.dark-mode .sudoku-cell.valid-entry {
     border-right: 3px solid #333;
 }
 
+body.dark-mode .sudoku-cell:nth-child(3),
+body.dark-mode .sudoku-cell:nth-child(6) {
+    border-right: 3px solid #888;
+}
+
 .sudoku-row:nth-child(3) .sudoku-cell,
 .sudoku-row:nth-child(6) .sudoku-cell {
     border-bottom: 3px solid #333;
+}
+
+body.dark-mode .sudoku-row:nth-child(3) .sudoku-cell,
+body.dark-mode .sudoku-row:nth-child(6) .sudoku-cell {
+    border-bottom: 3px solid #888;
 }
 
 .controls {

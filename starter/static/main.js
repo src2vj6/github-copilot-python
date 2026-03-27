@@ -221,6 +221,11 @@ function createBoardElement() {
       input.className = 'sudoku-cell';
       input.dataset.row = i;
       input.dataset.col = j;
+      // Add color class based on 3x3 box
+      const boxRow = Math.floor(i / 3);
+      const boxCol = Math.floor(j / 3);
+      const boxIndex = boxRow * 3 + boxCol;
+      input.classList.add(`box-${boxIndex}`);
       // Event listeners are now handled by event delegation in SolutionChecker
       rowDiv.appendChild(input);
     }
@@ -245,7 +250,7 @@ function renderPuzzle(puz) {
       if (val !== 0) {
         inp.value = val;
         inp.disabled = true;
-        inp.className += ' prefilled';
+        inp.classList.add('prefilled');
       } else {
         inp.value = '';
         inp.disabled = false;
