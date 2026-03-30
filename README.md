@@ -44,7 +44,19 @@ python app.py
 
 ## Testing
 
-For comprehensive information about running tests, including pytest and coverage reports, see the [Testing Framework documentation](starter/tests/README.md).
+### Run all tests with coverage report:
+```bash
+cd starter
+pytest
+```
+
+### Run with verbose output and detailed coverage report:
+```bash
+pytest -v --cov=. --cov-report=html
+# View coverage report in htmlcov/index.html
+```
+
+For more information about testing, including specific test files and markers, see the [Testing Framework documentation](starter/tests/README.md).
 
 ## Project Instructions
 
