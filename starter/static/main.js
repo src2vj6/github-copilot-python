@@ -340,6 +340,7 @@ async function getHint() {
   hintInput.value = data.value;
   hintInput.classList.remove('incorrect', 'valid-entry');
   hintInput.classList.add('hinted');
+  hintInput.disabled = true;
   hintsUsed++;
   updateHintsDisplay();
   msg.style.color = '#f57c00';
